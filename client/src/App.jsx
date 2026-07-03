@@ -1,7 +1,17 @@
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
 
 function App() {
-  return <div>Homepage</div>;
+  return (
+    <div className="bg-[url('./src/assets/bgImage.svg')] bg-contain">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </div>
+  );
 }
 
 export default App;
