@@ -1,4 +1,4 @@
-import assets from "../assets/assets";
+import assets, { userDummyData } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 
 const Sidebar = ({ selectedUser, setSelectedUser }) => {
@@ -30,7 +30,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
           </div>
         </div>
 
-        <div>
+        <div className="bg-[#282142] rounded-full flex items-center gap-2 px-4 py-3 mt-5">
           <img src={assets.search_icon} className="w-3" />
           <input
             type="text"
@@ -39,6 +39,39 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
             placeholder="Search User..."
           />
         </div>
+      </div>
+
+      <div className="flex flex-col">
+        {userDummyData.map((user, idx) => (
+          <div
+            key={idx}
+            onClick={() => setSelectedUser(user)}
+            className={`relative flex items-center gap-2 p-2 pl-4 rounded cursor-pointer
+                      max-sm:text-sm ${selectedUser?._id === user._id && "bg-[#282142]/50"}`}
+          >
+            <img
+              src={user?.profilePic || assets.avatar_icon}
+              className="w-8.75 aspect-square rounded-full"
+            />
+            <div className="flex flex-col leading-5">
+              <p>{user.fullName}</p>
+              {idx < 3 ? (
+                <span className="text-xs text-green-400">Online</span>
+              ) : (
+                <span className="text-xs text-neutral-400">Offline</span>
+              )}
+            </div>
+
+            {idx > 2 && (
+              <p
+                className="absolute top-4 right-4 text-xs w-5 h-5 flex items-center
+                           justify-center rounded-full bg-violet-500/50"
+              >
+                {idx}
+              </p>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
