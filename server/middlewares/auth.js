@@ -17,3 +17,5 @@ const protectRoute = async (req, res, next) => {
     res.json({ success: false, message: err.message });
   }
 };
+
+module.exports = protectRoute;

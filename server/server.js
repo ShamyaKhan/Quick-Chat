@@ -4,6 +4,8 @@ const dns = require("dns");
 const http = require("http");
 const express = require("express");
 const connectDB = require("./lib/db");
+const userRouter = require("./routes/userRoutes");
+const messageRouter = require("./routes/messageRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +18,9 @@ app.use(cors());
 app.use("/api/status", (req, res) => {
   res.send("Server is Live!");
 });
+
+app.use("/api/auth", userRouter);
+app.use("/api/messages", messageRouter);
 
 const PORT = process.env.PORT || 5000;
 
