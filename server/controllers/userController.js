@@ -1,4 +1,4 @@
-const { v2 } = require("cloudinary");
+const v2 = require("../lib/cloudinary");
 const { generateToken } = require("../lib/utils");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");

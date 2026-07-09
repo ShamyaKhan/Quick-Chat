@@ -1,5 +1,7 @@
 const Message = require("../models/Message");
 const User = require("../models/User");
+const v2 = require("../lib/cloudinary");
+const { userSocketMap, io } = require("../server");
 
 const getUsersForSidebar = async (req, res) => {
   try {
@@ -61,4 +63,42 @@ const markMessageAsSeen = async (req, res) => {
   }
 };
 
-module.exports = { getUsersForSidebar, getMessages, markMessageAsSeen };
+const sendMessage = async (req, res) => {
+  try {
+    const { text, image } = req.body;
+    const receiverId = req.params.id;
+    const senderId = req.user._id;
+
+    let imageUrl;
+
+    if (image) {
+      const uploadResponse = await v2.uploader.upload(image);
+      imageUrl = uploadResponse.secure_url;
+    }
+
+    const newMessage = await Message.create({
+      senderId,
+      receiverId,
+      text,
+      image: imageUrl,
+    });
+
+    // emit new message to receivers socket
+    const receiverSocketId = userSocketMap[receiverId];
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
+
+    res.json({ success: true, newMessage });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
+  }
+};
+
+module.exports = {
+  getUsersForSidebar,
+  getMessages,
+  markMessageAsSeen,
+  sendMessage,
+};
