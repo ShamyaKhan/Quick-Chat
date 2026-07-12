@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { AuthContext } from "./authContext";
 import toast from "react-hot-toast";
 
@@ -64,20 +64,18 @@ export const ChatProvider = ({ children }) => {
         return;
       }
 
-      socket.on("newMessage", (newMessage) => {
-        if(selectedUser && newMessage.senderId === selectedUser._id){
-            newMessage.seen = true;
-            setMessages((prevMessages) => [...prevMessages, newMessage]);
-            await axios.put(`/api/messages/mark/${newMessage._id}`)
-        }
-        else{
-            setUnseenMessages((prevUnseenMessages) => ({
-                    ...prevUnseenMessages, 
-                    [newMessage.senderId] :
-                    prevUnseenMessages[newMessage.senderId] 
-                    ? prevUnseenMessages[newMessage.senderId] + 1
-                   :1,
-            }));
+      socket.on("newMessage", async (newMessage) => {
+        if (selectedUser && newMessage.senderId === selectedUser._id) {
+          newMessage.seen = true;
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
+          await axios.put(`/api/messages/mark/${newMessage._id}`);
+        } else {
+          setUnseenMessages((prevUnseenMessages) => ({
+            ...prevUnseenMessages,
+            [newMessage.senderId]: prevUnseenMessages[newMessage.senderId]
+              ? prevUnseenMessages[newMessage.senderId] + 1
+              : 1,
+          }));
         }
       });
     } catch (err) {
@@ -85,7 +83,28 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  const value = {};
+  const unsubscribeFromMessages = () => {
+    if (socket) {
+      socket.off("newMessage");
+    }
+  };
+
+  useEffect(() => {
+    subscribeToMessages();
+    return () => unsubscribeFromMessages();
+  }, [socket, selectedUser]);
+
+  const value = {
+    messages,
+    users,
+    selectedUser,
+    getUsers,
+    setMessages,
+    sendMessage,
+    setSelectedUser,
+    unseenMessages,
+    setUnseenMessages,
+  };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };
