@@ -10,7 +10,7 @@ axios.defaults.baseURL = backendUrl;
 export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const [authUser, setAuthUser] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socket, setSocket] = useState(null);
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
         axios.defaults.headers.common["token"] = data.token;
         setToken(data.token);
 
-        localStorage.setItem("token", token);
+        localStorage.setItem("token", data.token);
         toast.success(data.message);
       } else {
         toast.error(data.message);

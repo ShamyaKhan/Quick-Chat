@@ -1,7 +1,7 @@
 const Message = require("../models/Message");
 const User = require("../models/User");
 const v2 = require("../lib/cloudinary");
-const { userSocketMap, io } = require("../server");
+const { userSocketMap, getIO } = require("../lib/socket");
 
 const getUsersForSidebar = async (req, res) => {
   try {
@@ -87,7 +87,7 @@ const sendMessage = async (req, res) => {
     const receiverSocketId = userSocketMap[receiverId];
 
     if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
+      getIO().to(receiverSocketId).emit("newMessage", newMessage);
     }
 
     res.json({ success: true, newMessage });
